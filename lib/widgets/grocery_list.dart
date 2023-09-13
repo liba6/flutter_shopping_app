@@ -11,23 +11,27 @@ class GroceryList extends ConsumerStatefulWidget {
 }
 
 class _GroceryListState extends ConsumerState {
+  final List<GroceryItem> _groceryItems = [];
 
-final List <GroceryItem> _groceryItems = [];
-
-  void _addItem() async{
-    final newItem = await 
-    Navigator.of(context).push<GroceryItem>(
+  void _addItem() async {
+    final newItem = await Navigator.of(context).push<GroceryItem>(
       MaterialPageRoute(
         builder: (ctx) => const NewItem(),
       ),
     );
-    if (newItem == null){
+    if (newItem == null) {
       return;
     }
     setState(() {
-          _groceryItems.add(newItem);
-
+      _groceryItems.add(newItem);
     });
+  }
+
+  void _removeItem(int index){
+setState(() {
+  _groceryItems.removeAt(index);
+
+});
   }
 
   @override
@@ -42,20 +46,34 @@ final List <GroceryItem> _groceryItems = [];
           )
         ],
       ),
-      body: ListView.builder(
-        itemCount: _groceryItems.length,
-        itemBuilder: (ctx, index) => ListTile(
-          title: Text(_groceryItems[index].name),
-          leading: Container(
-            width: 24,
-            height: 24,
-            color: _groceryItems[index].category.color,
-          ),
-          trailing: Text(
-            _groceryItems[index].quantity.toString(),
-          ),
-        ),
-      ),
+      body: _groceryItems.isEmpty
+          ? const Center(              child: Text('No items today. Go Shopping!'),
+)
+            
+          : ListView.builder(
+              itemCount: _groceryItems.length,
+              itemBuilder: (ctx, index) => ListTile(
+                  title: Row(
+                    children: [
+                      Text(_groceryItems[index].name),
+                      const SizedBox(width: 18),
+                      Text(
+                        _groceryItems[index].quantity.toString(),
+                      )
+                    ],
+                  ),
+                  leading: Container(
+                    width: 24,
+                    height: 24,
+                    color: _groceryItems[index].category.color,
+                  ),
+                  trailing: IconButton(
+                    onPressed: () {
+                      _removeItem(index);
+                      },
+                    icon: const Icon(Icons.delete),
+                  )),
+            ),
     );
   }
 }
